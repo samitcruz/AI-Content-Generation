@@ -1,0 +1,112 @@
+:root {
+  --bg: #12090a;
+  --panel: #1c1012;
+  --text: #f3e9ea;
+  --muted: #b9a4a7;
+  --accent: #c81d25;
+  --line: #3a2226;
+  font-family: "Segoe UI", "Helvetica Neue", sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  color: var(--text);
+  background:
+    radial-gradient(1200px 600px at 10% -10%, #4a1218 0%, transparent 55%),
+    radial-gradient(900px 500px at 100% 0%, #2a0c10 0%, transparent 50%),
+    var(--bg);
+}
+
+main {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 2.5rem 1.25rem 4rem;
+}
+
+.brand {
+  font-size: clamp(2rem, 5vw, 3.2rem);
+  letter-spacing: 0.02em;
+  margin: 0 0 0.35rem;
+}
+
+.tag {
+  color: var(--muted);
+  margin: 0 0 1.5rem;
+  max-width: 42rem;
+  line-height: 1.5;
+}
+
+.meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem 1rem;
+  color: var(--muted);
+  font-size: 0.92rem;
+  margin-bottom: 2rem;
+}
+
+.meta strong {
+  color: var(--text);
+  font-weight: 600;
+}
+
+.shot {
+  border-top: 1px solid var(--line);
+  padding: 1.1rem 0;
+}
+
+.shot h2 {
+  margin: 0 0 0.35rem;
+  font-size: 1.05rem;
+}
+
+.reason {
+  color: var(--accent);
+  font-size: 0.9rem;
+  margin: 0 0 0.65rem;
+}
+
+.grid {
+  display: grid;
+  gap: 0.75rem;
+}
+
+@media (min-width: 720px) {
+  .grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.lang {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 0.75rem 0.9rem;
+}
+
+.lang span {
+  display: block;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+  margin-bottom: 0.35rem;
+}
+
+.lang p {
+  margin: 0;
+  line-height: 1.45;
+}
+
+.note {
+  margin-top: 2rem;
+  padding: 1rem;
+  border: 1px dashed var(--line);
+  color: var(--muted);
+  font-size: 0.92rem;
+}

@@ -1,0 +1,32 @@
+node_modules/
+dist/
+.env
+.env.local
+*.log
+.DS_Store
+Thumbs.db
+
+# Large generated media (keep structure; commit small placeholders if needed)
+outputs/**/*.mp4
+outputs/**/*.wav
+outputs/**/*.mp3
+outputs/**/*.png
+outputs/**/*.jpg
+outputs/**/*.webp
+outputs/**/*.srt
+!outputs/**/.gitkeep
+
+# Cache
+.cache/
+pipeline/.cache/
+
+# Python / notebooks
+.venv/
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+
+# OS / IDE
+.idea/
+.vscode/
+*.swp
