@@ -35,10 +35,11 @@ Log as: **hypothesis → change → result**. Target ~10 entries. Add dates and 
 - **Change:** Wan / fallback prompts describe only motion and camera.
 - **Result:** _pending_
 
-### E05 — Ken Burns as respectable fallback
-- **Hypothesis:** Slow pan/zoom on strong keyframes beats a failed Wan clip for continuity.
-- **Change:** `fallback: kenburns` per shot when clip missing.
-- **Result:** _pending_
+### E05 — Ken Burns as respectable fallback / local animation
+- **Hypothesis:** Varied slow pan/zoom on strong keyframes beats static holds and buys time until Wan GPU clips exist.
+- **Change:** `kenburns-v2` in `pipeline/shots.js` with multiple zoom/pan patterns; Wan job contract in `kaggle/wan_ti2v.ipynb` + `wan_jobs.json`.
+- **Result:** All 10 shots re-exported as Ken Burns clips (~150–340KB each). Real Wan I2V still pending Kaggle GPU run (on-brief, not a deviation).
+- **Decision:** Ship Ken Burns now; replace per-shot with Wan downloads when ready.
 
 ### E06 — ACE-Step candidate batch
 - **Hypothesis:** Three instrumental candidates, auditioned under narration at low volume, beats one lucky generation.
@@ -50,10 +51,16 @@ Log as: **hypothesis → change → result**. Target ~10 entries. Add dates and 
 - **Change:** Use those defaults in assemble; tune by ear.
 - **Result:** _pending_
 
-### E08 — Amharic TTS on football names
-- **Hypothesis:** Gemini TTS may mispronounce Rooney / Old Trafford in Amharic lines.
-- **Change:** Native listen; adjust spelling/spacing in Amharic narration if needed.
-- **Result:** _pending_
+### E08 — Amharic TTS: Addis Voices 2 vs Gemini
+- **Hypothesis:** Addis male narration (`am-yohanes-calm`) will sound more natural in Amharic than Gemini TTS.
+- **Change:** Wire `addisai` SDK; Amharic → Addis primary, English → Gemini; male voice from catalog.
+- **Result:** After top-up, all 10 Amharic lines generated with **Addis Voices 2 / `am-yohanes-calm`** (male narration). Story time corrected to dusk 5–6pm (not late evening). Films reassembled.
+- **Decision:** Keep Addis + Yohanes Calm as Amharic default.
+
+### E08b — Amharic TTS on football names
+- **Hypothesis:** Even with Addis, names like Rooney / Old Trafford may need spelling hints.
+- **Change:** Native listen after Addis credit is available; adjust Amharic lines if needed.
+- **Result:** _pending (blocked on Addis credits)_
 
 ### E09 — Seed-locked prompt compare
 - **Hypothesis:** Changing one adjective with a fixed seed isolates style drift.

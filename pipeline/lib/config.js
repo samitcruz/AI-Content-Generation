@@ -28,6 +28,9 @@ export function requireEnv(keys) {
 
 export const env = {
   geminiKey: () => process.env.GEMINI_API_KEY,
+  /** Accept project name ADDIS_AI_API_KEY or SDK default ADDIS_API_KEY */
+  addisKey: () => process.env.ADDIS_AI_API_KEY || process.env.ADDIS_API_KEY,
+  addisVoiceAm: () => process.env.ADDIS_VOICE_AM || "am-yohanes-calm",
   cfAccount: () => process.env.CLOUDFLARE_ACCOUNT_ID,
   cfToken: () => process.env.CLOUDFLARE_API_TOKEN,
   imageModel: () =>

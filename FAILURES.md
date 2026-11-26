@@ -34,7 +34,14 @@ Record real blockers: quota, memory, consistency, language, tooling. What you tr
 - **Resolution / workaround:** Prompt-only body for `@cf/black-forest-labs/flux-1-schnell`; keep seeds in storyboard/logs for our own bookkeeping
 - **Evidence:** Workers AI error codes 5006 / 8007
 
-### F04 — _(next failure)_
+### F04 — Addis AI Amharic TTS: insufficient credits
+- **When:** 26 Nov live narration upgrade
+- **Symptom:** `INSUFFICIENT_CREDITS` / HTTP 402 — estimated Br 0.33, wallet Br 0.00
+- **Tried:** SDK `voice.generate` with `am-yohanes-calm`; key authenticates; `voices.list` works
+- **Resolution / workaround:** Pipeline keeps Addis as primary for `am`. On empty wallet, falls back to Gemini TTS and logs the error. Claim signup free credit or top up at [addisassistant.com](https://addisassistant.com/), then re-run `FILM_LANGUAGE=am npm run narration` + `npm run assemble`
+- **Evidence:** `runs.jsonl` narration errors with `addis-voices-2`; request id in logs
+
+### F05 — _(next failure)_
 - **When:**
 - **Symptom:**
 - **Tried:**

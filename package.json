@@ -20,9 +20,10 @@
     "node": ">=20"
   },
   "dependencies": {
+    "addisai": "^0.14.0",
     "ajv": "^8.17.1",
     "ajv-formats": "^3.0.1",
-    "dotenv": "^16.4.7",
-    "cross-env": "^7.0.3"
+    "cross-env": "^7.0.3",
+    "dotenv": "^16.4.7"
   }
 }

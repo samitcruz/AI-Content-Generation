@@ -2,7 +2,7 @@
 
 ## Audience
 
-Late-night football kids, diaspora friends, and anyone who fell for a club before they understood form tables. Primary viewing context: phone (vertical 9:16), with a horizontal cut for YouTube/friends.
+Football kids who watched at home as day turned dark, diaspora friends, and anyone who fell for a club before they understood form tables. Primary viewing context: phone (vertical 9:16), with a horizontal cut for YouTube/friends.
 
 ## Intent
 
@@ -10,11 +10,15 @@ By the end, the viewer should feel that **support can become identity** — kept
 
 ## Logline
 
-A homebound teenager finds Manchester United through late-night counter-attacks — and learns that loyalty outlasts winning.
+A homebound teenager finds Manchester United through dusk kickoffs and ruthless counter-attacks — and learns that loyalty outlasts winning.
 
 ## Why this story
 
-The maker grew up mostly at home, watching Premier League games near 11pm–midnight on an old TV from about age 12–13. Many clubs passed on that screen. Ferguson-era United stuck: fast, ruthless counter-attacking football, and a line of strikers (Rooney, Ronaldo, Tevez, Welbeck, van Persie). Peak memories include United 8–2 Arsenal at Old Trafford and Rooney’s overhead kick. The club’s form has since faded; the love has not.
+The maker grew up mostly at home, watching Premier League games around **5–6pm, just as it was getting dark**, on an old TV from about age 12–13. Many clubs passed on that screen. Ferguson-era United stuck: fast, ruthless counter-attacking football, and a line of strikers (Rooney, Ronaldo, Tevez, Welbeck, van Persie). Peak memories include United 8–2 Arsenal at Old Trafford and Rooney’s overhead kick. The club’s form has since faded; the love has not.
+
+## Time correction (user note)
+
+Do **not** frame the home ritual as late evening / 11pm / midnight. Kickoff memory is late afternoon into dusk.
 
 ## Visual rules (ethics + consistency)
 

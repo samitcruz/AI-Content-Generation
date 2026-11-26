@@ -6,15 +6,31 @@ import { ensureOutputDirs, writeJson } from "./lib/fsutil.js";
 import { paths, shotKeyframePath, shotVideoPath } from "./lib/paths.js";
 import { shouldSkip, writeCacheMeta, hashInputs } from "./lib/cache.js";
 import { isDryRun } from "./lib/config.js";
-import { writePlaceholderMp4 } from "./lib/placeholder.js";
+import { writeKenBurnsMp4 } from "./lib/placeholder.js";
 import { isMain } from "./lib/main.js";
+
+function resolveKeyframe(shotId) {
+  const png = shotKeyframePath(shotId);
+  const jpg = png.replace(/\.png$/i, ".jpg");
+  if (fs.existsSync(png) && fs.statSync(png).size > 10000) return png;
+  if (fs.existsSync(jpg) && fs.statSync(jpg).size > 10000) return jpg;
+  if (fs.existsSync(png)) return png;
+  if (fs.existsSync(jpg)) return jpg;
+  return null;
+}
+
+function isLikelyRealWanClip(filePath) {
+  // Ken Burns clips from stills are usually small; Wan clips are larger.
+  try {
+    return fs.existsSync(filePath) && fs.statSync(filePath).size > 250000;
+  } catch {
+    return false;
+  }
+}
 
 /**
  * Moving-shots stage.
- * Wan 2.2 runs on Kaggle (GPU). This stage:
- *  - builds a job manifest for the notebook
- *  - uses Ken Burns / still fallbacks locally when clips are missing (dry-run or quota)
- *  - if outputs/shots/{id}.mp4 already exists from a Kaggle download, caches and keeps it
+ * Prefer Wan 2.2 clips from Kaggle when present; otherwise generate varied Ken Burns locally.
  */
 export async function runShots() {
   stageBanner("shots");
@@ -24,8 +40,9 @@ export async function runShots() {
   const jobs = sb.shots.map((shot) => ({
     id: shot.id,
     durationSec: Math.min(5, shot.durationSec),
-    keyframe: `keyframes/${shot.id}.png`,
-    motionPrompt: `${shot.motionPrompt}. Camera: ${shot.camera}. Slow gentle motion only.`,
+    keyframePng: `keyframes/${shot.id}.png`,
+    keyframeJpg: `keyframes/${shot.id}.jpg`,
+    motionPrompt: `${shot.motionPrompt}. Camera: ${shot.camera}. Slow gentle motion only. No logos.`,
     seed: shot.seed,
     fallback: shot.fallback || "kenburns",
   }));
@@ -33,30 +50,31 @@ export async function runShots() {
   const manifestPath = path.join(paths.shots, "wan_jobs.json");
   writeJson(manifestPath, {
     model: "Wan2.2-TI2V-5B",
-    note: "Run kaggle/wan_ti2v.ipynb, then copy mp4 files into outputs/shots/",
+    notebook: "kaggle/wan_ti2v.ipynb",
+    note: "Upload keyframes + this JSON to Kaggle, run GPU notebook, download mp4s into outputs/shots/",
     jobs,
   });
 
-  for (const shot of sb.shots) {
+  for (const [index, shot] of sb.shots.entries()) {
     const out = shotVideoPath(shot.id);
-    const keyframe = shotKeyframePath(shot.id);
+    const keyframe = resolveKeyframe(shot.id);
     const inputs = {
       stage: "shots",
       shot: shot.id,
       motion: shot.motionPrompt,
       camera: shot.camera,
-      keyframeHash: fs.existsSync(keyframe)
+      keyframeHash: keyframe
         ? hashInputs({ mtime: fs.statSync(keyframe).mtimeMs, size: fs.statSync(keyframe).size })
         : null,
+      animator: "kenburns-v2",
     };
     const { skip, key } = shouldSkip("shots", inputs, out);
 
-    // Prefer a real downloaded clip if present and cache says ok
-    if (skip) {
+    if (skip && fs.existsSync(out) && fs.statSync(out).size > 5000) {
       console.log(`skip ${shot.id} (cache)`);
       logRun({
         stage: "shots",
-        model: "Wan2.2-TI2V-5B",
+        model: isLikelyRealWanClip(out) ? "Wan2.2-TI2V-5B" : "kenburns-v2",
         parameters: { shot: shot.id, cached: true },
         seed: shot.seed,
         latencyMs: 0,
@@ -66,46 +84,54 @@ export async function runShots() {
       continue;
     }
 
-    // If user already dropped a real mp4 here (not a stub), accept it
-    if (fs.existsSync(out) && fs.statSync(out).size > 1000) {
-      writeCacheMeta("shots", key, out, { source: "preexisting" });
+    if (isLikelyRealWanClip(out)) {
+      writeCacheMeta("shots", key, out, { source: "wan-or-preexisting" });
       logRun({
         stage: "shots",
         model: "Wan2.2-TI2V-5B",
-        parameters: { shot: shot.id, source: "preexisting-file" },
+        parameters: { shot: shot.id, source: "preexisting-file", bytes: fs.statSync(out).size },
         seed: shot.seed,
         latencyMs: 0,
         costUsd: 0,
         status: "ok",
       });
-      console.log(`ok ${shot.id} (existing clip)`);
+      console.log(`ok ${shot.id} (existing Wan-sized clip)`);
       continue;
     }
 
-    const how = writePlaceholderMp4(out, Math.min(5, shot.durationSec), fs.existsSync(keyframe) ? keyframe : null);
+    // Force regenerate weak stubs / old still holds
+    if (fs.existsSync(out)) fs.unlinkSync(out);
+
+    const t0 = Date.now();
+    const dur = Math.min(shot.durationSec, 8);
+    const how = writeKenBurnsMp4(out, dur, keyframe, index + (shot.seed || 0));
+    const bytes = fs.existsSync(out) ? fs.statSync(out).size : 0;
     writeCacheMeta("shots", key, out, {
       dryRun: isDryRun(),
-      fallback: shot.fallback || "kenburns",
+      fallback: "kenburns",
       how,
+      bytes,
     });
     logRun({
       stage: "shots",
-      model: isDryRun() ? "dry-run-kenburns" : "kenburns-fallback",
+      model: isDryRun() ? "dry-run-kenburns" : "kenburns-v2",
       parameters: {
         shot: shot.id,
-        fallback: shot.fallback || "kenburns",
-        note: "Replace with Wan clip from Kaggle when ready",
+        fallback: "kenburns",
+        how,
+        bytes,
+        note: "Replace with Wan clip from kaggle/wan_ti2v.ipynb when GPU available",
       },
       seed: shot.seed,
-      latencyMs: 0,
+      latencyMs: Date.now() - t0,
       costUsd: 0,
       status: isDryRun() ? "dry-run" : "fallback",
     });
-    console.log(`${isDryRun() ? "dry-run" : "fallback"} ${shot.id} (${how})`);
+    console.log(`${isDryRun() ? "dry-run" : "kenburns"} ${shot.id} (${how}, ${bytes}B)`);
   }
 
   console.log(`Job manifest → ${manifestPath}`);
-  console.log("Next: open kaggle/wan_ti2v.ipynb, generate clips, copy into outputs/shots/");
+  console.log("For real I2V: open kaggle/wan_ti2v.ipynb (GPU T4), then copy mp4s into outputs/shots/");
 }
 
 if (isMain(import.meta.url)) {

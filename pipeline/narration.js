@@ -1,91 +1,25 @@
 import fs from "node:fs";
+import path from "node:path";
+import { execFileSync } from "node:child_process";
 import { stageBanner, logRun } from "./lib/log.js";
 import { loadStoryboard } from "./lib/validate.js";
 import { ensureOutputDirs } from "./lib/fsutil.js";
 import { narrationPath } from "./lib/paths.js";
 import { shouldSkip, writeCacheMeta } from "./lib/cache.js";
-import { env, filmLanguages, isDryRun, requireEnv } from "./lib/config.js";
+import { env, filmLanguages, isDryRun } from "./lib/config.js";
 import { writeSilentWav } from "./lib/placeholder.js";
 import { isMain } from "./lib/main.js";
 
-const TTS_MODELS = [
+const GEMINI_TTS_MODELS = [
   "gemini-3.8-flash-tts",
   "gemini-3.1-flash-tts-preview",
   "gemini-2.5-flash-preview-tts",
 ];
-const VOICE_AM = "Kore";
 const VOICE_EN = "Puck";
 
 function parseRateFromMime(mime) {
   const m = /rate=(\d+)/i.exec(mime || "");
   return m ? Number(m[1]) : 24000;
-}
-
-async function synthesizeGemini(text, lang, outPath) {
-  requireEnv(["GEMINI_API_KEY"]);
-  const style =
-    lang === "am"
-      ? "Speak in clear Amharic, warm, unhurried, intimate documentary narration."
-      : "Speak in clear English, warm, unhurried, intimate documentary narration.";
-
-  const spoken = `${style}\n\n${text}`;
-  const t0 = Date.now();
-  let lastErr = null;
-
-  for (const model of TTS_MODELS) {
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${env.geminiKey()}`;
-    const body = {
-      contents: [{ parts: [{ text: spoken }] }],
-      generationConfig: {
-        responseModalities: ["AUDIO"],
-        speechConfig: {
-          voiceConfig: {
-            prebuiltVoiceConfig: { voiceName: lang === "am" ? VOICE_AM : VOICE_EN },
-          },
-        },
-      },
-    };
-
-    const res = await fetch(url, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(body),
-    });
-    if (!res.ok) {
-      const errText = await res.text();
-      lastErr = new Error(`Gemini TTS ${model} ${res.status}: ${errText.slice(0, 300)}`);
-      // Retry other models on 404/503; fail fast on auth errors
-      if (res.status === 401 || res.status === 403) throw lastErr;
-      continue;
-    }
-
-    const json = await res.json();
-    const inline = json?.candidates?.[0]?.content?.parts?.find((p) => p.inlineData)?.inlineData;
-    if (!inline?.data) {
-      lastErr = new Error(`Gemini TTS ${model} returned no audio data`);
-      continue;
-    }
-
-    const mime = inline.mimeType || "";
-    const raw = Buffer.from(inline.data, "base64");
-    if (mime.includes("pcm") || mime.includes("L16") || (!mime.includes("wav") && !mime.includes("mp3"))) {
-      const rate = parseRateFromMime(mime);
-      fs.writeFileSync(outPath, pcmToWav(raw, rate, 1));
-    } else {
-      fs.writeFileSync(outPath, raw);
-    }
-
-    // Reject empty / near-silent stubs so we don't cache bad audio
-    const st = fs.statSync(outPath);
-    if (st.size < 20000) {
-      lastErr = new Error(`Gemini TTS ${model} wrote suspiciously small file (${st.size} bytes)`);
-      continue;
-    }
-
-    return { latencyMs: Date.now() - t0, model, mime, bytes: st.size };
-  }
-
-  throw lastErr || new Error("Gemini TTS failed for all models");
 }
 
 function pcmToWav(pcm, sampleRate, channels) {
@@ -108,7 +42,6 @@ function pcmToWav(pcm, sampleRate, channels) {
   return buffer;
 }
 
-/** Treat tiny silent placeholders as missing so live runs regenerate them. */
 function isUsableNarration(filePath) {
   try {
     if (!fs.existsSync(filePath)) return false;
@@ -118,25 +51,166 @@ function isUsableNarration(filePath) {
   }
 }
 
+function toWavIfNeeded(filePath) {
+  if (filePath.endsWith(".wav")) return filePath;
+  const wav = filePath.replace(/\.[^.]+$/, ".wav");
+  execFileSync("ffmpeg", ["-y", "-i", filePath, wav], { stdio: "ignore" });
+  return wav;
+}
+
+async function resolveAddisMaleVoice(addis) {
+  const preferred = env.addisVoiceAm();
+  try {
+    const voices = await addis.voices.list({ language: "am", gender: "male" });
+    const list = Array.isArray(voices) ? voices : voices?.data || voices?.voices || [];
+    const available = list.filter((v) => v.isAvailable !== false);
+    const byId = available.find((v) => v.id === preferred);
+    if (byId) return byId.id;
+    const narration = available.find((v) =>
+      /yohanes|yohannes|narrat|calm|reflect/i.test(
+        `${v.id} ${v.name || ""} ${v.style || ""} ${v.descriptor || ""}`
+      )
+    );
+    if (narration) return narration.id;
+    if (available[0]?.id) return available[0].id;
+  } catch (err) {
+    console.warn(`Addis voices.list failed (${err.message}); using ${preferred}`);
+  }
+  return preferred;
+}
+
+async function synthesizeAddisAmharic(text, outPath) {
+  const key = env.addisKey();
+  if (!key) throw new Error("Missing ADDIS_AI_API_KEY (or ADDIS_API_KEY)");
+
+  const { default: AddisAI } = await import("addisai");
+  const addis = new AddisAI({ apiKey: key });
+  const voiceId = await resolveAddisMaleVoice(addis);
+  const t0 = Date.now();
+
+  const clip = await addis.voice.generate({
+    voiceId,
+    text,
+    language: "am",
+    outputFormat: "wav_44100",
+    voiceSettings: { speed: 45, stability: 60, similarity: 55, style: 20 },
+  });
+
+  const tmp = `${outPath}.tmp.wav`;
+  if (typeof clip.toFile === "function") {
+    await clip.toFile(tmp);
+  } else if (clip.audioUrl) {
+    const res = await fetch(clip.audioUrl);
+    if (!res.ok) throw new Error(`Addis audio download ${res.status}`);
+    fs.writeFileSync(tmp, Buffer.from(await res.arrayBuffer()));
+  } else {
+    throw new Error("Addis TTS returned no file/url");
+  }
+
+  // Normalize to mono 24k WAV for consistent assemble
+  try {
+    execFileSync(
+      "ffmpeg",
+      ["-y", "-i", tmp, "-ac", "1", "-ar", "24000", outPath],
+      { stdio: "ignore" }
+    );
+    fs.unlinkSync(tmp);
+  } catch {
+    fs.renameSync(tmp, outPath);
+  }
+
+  const bytes = fs.statSync(outPath).size;
+  if (bytes < 20000) throw new Error(`Addis wrote suspiciously small file (${bytes}B)`);
+
+  return {
+    latencyMs: Date.now() - t0,
+    model: "addis-voices-2",
+    voiceId,
+    bytes,
+    durationSeconds: clip.durationSeconds ?? null,
+  };
+}
+
+async function synthesizeGeminiEnglish(text, outPath) {
+  const key = env.geminiKey();
+  if (!key) throw new Error("Missing GEMINI_API_KEY");
+
+  const style = "Speak in clear English, warm, unhurried, intimate documentary narration.";
+  const spoken = `${style}\n\n${text}`;
+  const t0 = Date.now();
+  let lastErr = null;
+
+  for (const model of GEMINI_TTS_MODELS) {
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${key}`;
+    const body = {
+      contents: [{ parts: [{ text: spoken }] }],
+      generationConfig: {
+        responseModalities: ["AUDIO"],
+        speechConfig: {
+          voiceConfig: { prebuiltVoiceConfig: { voiceName: VOICE_EN } },
+        },
+      },
+    };
+    const res = await fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    });
+    if (!res.ok) {
+      lastErr = new Error(`Gemini TTS ${model} ${res.status}: ${(await res.text()).slice(0, 300)}`);
+      if (res.status === 401 || res.status === 403) throw lastErr;
+      continue;
+    }
+    const json = await res.json();
+    const inline = json?.candidates?.[0]?.content?.parts?.find((p) => p.inlineData)?.inlineData;
+    if (!inline?.data) {
+      lastErr = new Error(`Gemini TTS ${model} returned no audio`);
+      continue;
+    }
+    const mime = inline.mimeType || "";
+    const raw = Buffer.from(inline.data, "base64");
+    if (mime.includes("pcm") || mime.includes("L16") || (!mime.includes("wav") && !mime.includes("mp3"))) {
+      fs.writeFileSync(outPath, pcmToWav(raw, parseRateFromMime(mime), 1));
+    } else {
+      fs.writeFileSync(outPath, raw);
+      toWavIfNeeded(outPath);
+    }
+    const bytes = fs.statSync(outPath).size;
+    if (bytes < 20000) {
+      lastErr = new Error(`Gemini TTS ${model} small file (${bytes}B)`);
+      continue;
+    }
+    return { latencyMs: Date.now() - t0, model, voiceId: VOICE_EN, bytes };
+  }
+  throw lastErr || new Error("Gemini TTS failed");
+}
+
 export async function runNarration() {
   stageBanner("narration");
   ensureOutputDirs();
   const sb = loadStoryboard();
   const langs = filmLanguages();
-  const primaryModel = TTS_MODELS[0];
 
   for (const lang of langs) {
     for (const shot of sb.shots) {
       const text = shot.narration[lang];
       const out = narrationPath(shot.id, lang);
-      const inputs = { stage: "narration", shot: shot.id, lang, text, model: primaryModel };
+      const provider = lang === "am" ? "addis" : "gemini";
+      const inputs = {
+        stage: "narration",
+        shot: shot.id,
+        lang,
+        text,
+        provider,
+        voice: lang === "am" ? env.addisVoiceAm() : VOICE_EN,
+      };
       const { skip, key } = shouldSkip("narration", inputs, out);
 
       if (skip && isUsableNarration(out)) {
         console.log(`skip ${shot.id}/${lang} (cache)`);
         logRun({
           stage: "narration",
-          model: primaryModel,
+          model: provider,
           parameters: { shot: shot.id, lang, cached: true },
           seed: null,
           latencyMs: 0,
@@ -146,10 +220,7 @@ export async function runNarration() {
         continue;
       }
 
-      // Drop tiny stubs so we never assemble silence by accident
-      if (fs.existsSync(out) && !isUsableNarration(out)) {
-        fs.unlinkSync(out);
-      }
+      if (fs.existsSync(out) && !isUsableNarration(out)) fs.unlinkSync(out);
 
       if (isDryRun()) {
         const how = writeSilentWav(out, Math.max(1.5, shot.durationSec * 0.7));
@@ -157,7 +228,7 @@ export async function runNarration() {
         logRun({
           stage: "narration",
           model: "dry-run-silence",
-          parameters: { shot: shot.id, lang, textChars: text.length },
+          parameters: { shot: shot.id, lang },
           seed: null,
           latencyMs: 0,
           costUsd: 0,
@@ -168,29 +239,61 @@ export async function runNarration() {
       }
 
       try {
-        const result = await synthesizeGemini(text, lang, out);
-        writeCacheMeta("narration", key, out, { mime: result.mime, bytes: result.bytes });
+        let result;
+        if (lang === "am") {
+          try {
+            result = await synthesizeAddisAmharic(text, out);
+          } catch (addisErr) {
+            const msg = String(addisErr.message || addisErr);
+            const credits =
+              /insufficient|credits|balance_too_low|402/i.test(msg) ||
+              addisErr?.code === "INSUFFICIENT_CREDITS" ||
+              addisErr?.status === 402;
+            if (!credits) throw addisErr;
+            console.warn(
+              `Addis wallet empty for ${shot.id}/am — falling back to Gemini TTS. Top up free credit at addisassistant.com`
+            );
+            logRun({
+              stage: "narration",
+              model: "addis-voices-2",
+              parameters: { shot: shot.id, lang, fallback: "gemini" },
+              seed: null,
+              latencyMs: 0,
+              costUsd: 0,
+              status: "error",
+              error: msg.slice(0, 300),
+            });
+            // Reuse English Gemini path with Amharic text (quality weaker; temporary)
+            result = await synthesizeGeminiEnglish(text, out);
+            result = { ...result, model: `${result.model}+am-fallback`, voiceId: `${result.voiceId}-am` };
+          }
+        } else {
+          result = await synthesizeGeminiEnglish(text, out);
+        }
+        writeCacheMeta("narration", key, out, { bytes: result.bytes, voiceId: result.voiceId });
         logRun({
           stage: "narration",
           model: result.model,
           parameters: {
             shot: shot.id,
             lang,
-            voice: lang === "am" ? VOICE_AM : VOICE_EN,
+            voice: result.voiceId,
             bytes: result.bytes,
+            durationSeconds: result.durationSeconds ?? undefined,
           },
           seed: null,
           latencyMs: result.latencyMs,
           costUsd: 0,
           status: "ok",
         });
-        console.log(`ok ${shot.id}/${lang} (${result.latencyMs}ms, ${result.bytes}B, ${result.model})`);
+        console.log(
+          `ok ${shot.id}/${lang} (${result.latencyMs}ms, ${result.bytes}B, ${result.model}, ${result.voiceId})`
+        );
       } catch (err) {
-        // Do not leave a silent file that looks like success
         if (fs.existsSync(out)) fs.unlinkSync(out);
         logRun({
           stage: "narration",
-          model: primaryModel,
+          model: provider,
           parameters: { shot: shot.id, lang },
           seed: null,
           latencyMs: 0,

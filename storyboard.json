@@ -1,27 +1,27 @@
 {
-  "version": "1.0.0",
+  "version": "1.1.0",
   "title": "Red After Midnight",
-  "logline": "A homebound teenager finds Manchester United through late-night counter-attacks — and learns that loyalty outlasts winning.",
-  "audience": "Late-night football kids, diaspora friends, and anyone who fell for a club before they understood form tables.",
+  "logline": "A homebound teenager finds Manchester United through dusk kickoffs and ruthless counter-attacks — and learns that loyalty outlasts winning.",
+  "audience": "Football kids who watched at home as day turned to dark, diaspora friends, and anyone who fell for a club before they understood form tables.",
   "intent": "By the end, the viewer should feel that support can become identity — kept even when the glory years fade.",
   "durationTargetSec": 78,
   "aspectRatios": ["9:16", "16:9"],
   "style": {
-    "block": "cinematic night interior, warm CRT television glow, soft grain, muted red accents, shallow depth of field, intimate documentary still, no logos, no crests, no readable text, anonymous faces only",
-    "negative": "manchester united crest, club badge, official kit branding, celebrity face, known footballer likeness, watermark, extra fingers, garbled text, bright daylight studio"
+    "block": "cinematic dusk interior just as daylight fades, warm CRT television glow against blue-hour window light, soft grain, muted red accents, shallow depth of field, intimate documentary still, no logos, no crests, no readable text, anonymous faces only",
+    "negative": "manchester united crest, club badge, official kit branding, celebrity face, known footballer likeness, watermark, extra fingers, garbled text, bright noon daylight studio, deep midnight blackness only"
   },
   "character": {
     "id": "young_fan",
     "description": "Anonymous East African teenage boy, roughly 12–13, short dark hair, simple home clothes, seen mostly from behind or in soft profile; never a recognisable real person.",
-    "referencePrompt": "character reference sheet of an anonymous East African teenage boy age about 13, front three-quarter and soft profile, simple home clothes, warm CRT light on skin, cinematic grain, consistent face across views, no logos"
+    "referencePrompt": "character reference sheet of an anonymous East African teenage boy age about 13, front three-quarter and soft profile, simple home clothes, warm CRT light mixed with dusk window light on skin, cinematic grain, consistent face across views, no logos"
   },
   "music": {
-    "caption": "instrumental cinematic underscore, sparse piano and soft strings, night-time tension building into a brief hopeful surge then settling into quiet loyalty, gentle texture under narration, no vocals, no melody that fights speech",
+    "caption": "instrumental cinematic underscore, sparse piano and soft strings, dusk tension building into a brief hopeful surge then settling into quiet loyalty, gentle texture under narration, no vocals, no melody that fights speech",
     "durationSec": 82,
     "tempoBpm": 78,
     "instrumental": true,
     "cues": [
-      { "atSec": 0, "purpose": "quiet night atmosphere under opening ritual" },
+      { "atSec": 0, "purpose": "quiet dusk atmosphere under opening ritual" },
       { "atSec": 28, "purpose": "rise with discovery of counter-attacking play" },
       { "atSec": 48, "purpose": "peak joy / stadium awe" },
       { "atSec": 64, "purpose": "soften into lifelong loyalty" }
@@ -35,12 +35,12 @@
     {
       "id": "shot_01",
       "durationSec": 7,
-      "reason": "Establish isolation and the late-night home ritual.",
+      "reason": "Establish isolation and the dusk home ritual as light falls.",
       "camera": "static wide, eye-level",
       "fallback": "kenburns",
       "seed": 101,
-      "imagePrompt": "dark Ethiopian living room at night, old CRT television glowing alone, wall clock near 23:00, empty sofa, warm grain, anonymous young fan not yet in frame",
-      "motionPrompt": "slow push-in toward the glowing television, dust motes in the light, fixed camera otherwise",
+      "imagePrompt": "Ethiopian living room at dusk just getting dark, blue-hour window light, old CRT television glowing alone, wall clock near 17:30, empty sofa, warm grain, anonymous young fan not yet in frame",
+      "motionPrompt": "slow push-in toward the glowing television, dust motes in the mixed dusk and CRT light, fixed camera otherwise",
       "narration": {
         "en": "From twelve, home was my world. I did not wander far.",
         "am": "ከአስራ ሁለት ዓመቴ ጀምሮ ቤት ዓለሜ ነበር። ሩቅ አልዘወርም ነበር።"
@@ -49,15 +49,15 @@
     {
       "id": "shot_02",
       "durationSec": 8,
-      "reason": "Show the boy with the old TV during late Premier League kickoffs.",
+      "reason": "Show the boy with the old TV around 5–6pm Premier League kickoffs.",
       "camera": "over-the-shoulder, locked-off",
       "fallback": "kenburns",
       "seed": 102,
-      "imagePrompt": "anonymous East African teenage boy from behind on a sofa, old CRT TV casting blue-red light on his shoulders, remote in hand, late night living room, no logos on screen",
+      "imagePrompt": "anonymous East African teenage boy from behind on a sofa, old CRT TV casting glow on his shoulders, remote in hand, living room just getting dark around late afternoon, dusk outside the window, no logos on screen",
       "motionPrompt": "subtle breathing stillness, soft flicker of TV light on his shoulders, camera locked",
       "narration": {
-        "en": "Late games on the old TV, near eleven or midnight, while the city slept.",
-        "am": "ከከተማው እንቅልፍ ጋር፣ ሌሊት አሥራ አንድ ወይም እኩለ ሌሊት አካባቢ፣ በድሮው ቲቪ ላይ ጨዋታዎችን እመለከት ነበር።"
+        "en": "Games on the old TV around five or six, just as it was getting dark.",
+        "am": "ከሰዓት በኋላ አምስት ወይም ስድስት አካባቢ፣ ጨለማ ሲጀምር፣ በድሮው ቲቪ ላይ ጨዋታዎችን እመለከት ነበር።"
       }
     },
     {
@@ -67,7 +67,7 @@
       "camera": "gentle pan across colour blurs",
       "fallback": "kenburns",
       "seed": 103,
-      "imagePrompt": "abstract football night montage as colour blurs on a CRT — soft greens, golds and reds, no crests, no player faces, grainy broadcast feel",
+      "imagePrompt": "abstract football broadcast montage as colour blurs on a CRT — soft greens, golds and reds, no crests, no player faces, grainy broadcast feel, dusk room ambience",
       "motionPrompt": "slow horizontal pan across soft colour blurs, gentle TV flicker",
       "narration": {
         "en": "I watched many sides — Arsenal’s peaks, Blackburn’s brief glory, and more.",
@@ -95,7 +95,7 @@
       "camera": "medium close on fan, soft rack feel",
       "fallback": "kenburns",
       "seed": 105,
-      "imagePrompt": "anonymous teenage fan leaning forward in CRT glow, eyes reflecting the screen, soft red rim light, intimate, no celebrity likeness anywhere",
+      "imagePrompt": "anonymous teenage fan leaning forward in CRT glow mixed with dusk light, eyes reflecting the screen, soft red rim light, intimate, no celebrity likeness anywhere",
       "motionPrompt": "slow push-in on the boy’s profile, TV light flickering gently",
       "narration": {
         "en": "I fell for the strikers — Rooney, Ronaldo, Tevez, Welbeck, van Persie.",
@@ -109,7 +109,7 @@
       "camera": "wide to medium, slow dolly feel",
       "fallback": "kenburns",
       "seed": 106,
-      "imagePrompt": "same anonymous boy smaller in a larger dark room, TV brighter, night deepening outside a window, sense of ritual becoming habit",
+      "imagePrompt": "same anonymous boy smaller in a larger room, TV brighter, dusk deepening outside a window toward blue hour, sense of ritual becoming habit",
       "motionPrompt": "very slow dolly toward the boy and TV, quiet atmosphere",
       "narration": {
         "en": "Support became habit — then something closer to addiction.",
@@ -119,15 +119,15 @@
     {
       "id": "shot_07",
       "durationSec": 8,
-      "reason": "Peak joy: the 8–2 night, told as memory not branding.",
+      "reason": "Peak joy: the 8–2 match, told as memory not branding.",
       "camera": "low-angle floodlights, slight handheld",
       "fallback": "kenburns",
       "seed": 107,
-      "imagePrompt": "generic night stadium floodlights flaring, anonymous crowd as soft bokeh, pitch glow, awe without logos or scoreboard text",
+      "imagePrompt": "generic stadium floodlights flaring, anonymous crowd as soft bokeh, pitch glow, awe without logos or scoreboard text",
       "motionPrompt": "slight handheld energy, lights bloom softly, crowd shimmer",
       "narration": {
-        "en": "Happiest night: eight goals at Old Trafford against Arsenal.",
-        "am": "ደስተኛው ሌሊት — በኦልድ ትራፎርድ ላይ አርሰናልን በስምንት ጎሎች መምታት።"
+        "en": "Happiest match: eight goals at Old Trafford against Arsenal.",
+        "am": "ደስተኛው ጨዋታ — በኦልድ ትራፎርድ ላይ አርሰናልን በስምንት ጎሎች መምታት።"
       }
     },
     {
@@ -151,7 +151,7 @@
       "camera": "static medium, quieter light",
       "fallback": "kenburns",
       "seed": 109,
-      "imagePrompt": "same anonymous fan a little older, watching a small screen in a quieter room, muted red accent, calmer night, loyalty without triumph",
+      "imagePrompt": "same anonymous fan a little older, watching a small screen in a quieter room, muted red accent, soft late-day light, loyalty without triumph",
       "motionPrompt": "almost still, soft breathing of light, slow ken burns if still",
       "narration": {
         "en": "Form comes and goes. The love does not.",
@@ -165,7 +165,7 @@
       "camera": "slow fade hold",
       "fallback": "still",
       "seed": 110,
-      "imagePrompt": "empty warm room after the match glow fades, single soft red light remaining, peaceful, no text",
+      "imagePrompt": "empty warm room after the match glow fades, single soft red light remaining, peaceful dusk residue, no text",
       "motionPrompt": "very slow fade toward stillness",
       "narration": {
         "en": "Some loyalties you choose once — and keep for life.",

@@ -2,13 +2,22 @@
 
 Do these in order. Cursor is already your coding agent — you do **not** need Antigravity/OpenCode unless you want a second agent.
 
-## 1. Gemini API (required for real narration)
+## 1. Gemini API (required for English narration)
 
 1. Open [Google AI Studio](https://aistudio.google.com/apikey)
 2. Create an API key
 3. Put it in `.env` as `GEMINI_API_KEY=...`
 
-Used for: TTS narration (Amharic + English), optional script helpers.
+Used for: English TTS, optional script helpers. Amharic falls back here only if Addis wallet is empty.
+
+## 1b. Addis AI (required for good Amharic narration)
+
+1. Sign up at [addisassistant.com](https://addisassistant.com/)
+2. Create an API key; claim signup free credit if offered (~$3.17 / check dashboard wallet)
+3. Put it in `.env` as `ADDIS_AI_API_KEY=...`
+4. Optional: `ADDIS_VOICE_AM=am-yohanes-calm` (male narration)
+
+Used for: Amharic TTS via Addis Voices 2. Docs: https://docs.addisassistant.com/docs/capabilities/text-to-speech
 
 ## 2. Cloudflare Workers AI (required for real keyframes)
 

@@ -69,6 +69,59 @@ export function writeSilentWav(filePath, durationSec = 2) {
   }
 }
 
+/**
+ * Ken Burns pan/zoom over a still. `variant` picks motion direction so consecutive shots differ.
+ */
+export function writeKenBurnsMp4(filePath, durationSec, fromImage, variant = 0) {
+  fs.mkdirSync(path.dirname(filePath), { recursive: true });
+  if (!fromImage || !fs.existsSync(fromImage)) {
+    return writePlaceholderMp4(filePath, durationSec, null);
+  }
+  const frames = Math.max(24, Math.round(Number(durationSec) * 24));
+  const patterns = [
+    // slow zoom in, centered
+    `z='min(1.0+0.0015*on,1.12)':x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)'`,
+    // zoom in drifting up
+    `z='min(1.0+0.0012*on,1.10)':x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)-on*0.15'`,
+    // zoom in drifting right
+    `z='min(1.0+0.0012*on,1.10)':x='iw/2-(iw/zoom/2)+on*0.12':y='ih/2-(ih/zoom/2)'`,
+    // gentle zoom out feel via starting higher (clamped)
+    `z='if(eq(on,1),1.08,max(1.08-0.001*on,1.0))':x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)'`,
+  ];
+  const z = patterns[Math.abs(variant) % patterns.length];
+  const vf =
+    `scale=900:1500:force_original_aspect_ratio=increase,` +
+    `crop=900:1500,` +
+    `zoompan=${z}:d=1:s=768x1280:fps=24,` +
+    `trim=end_frame=${frames},setpts=PTS-STARTPTS`;
+  try {
+    execFileSync(
+      "ffmpeg",
+      [
+        "-y",
+        "-loop",
+        "1",
+        "-i",
+        fromImage,
+        "-t",
+        String(durationSec),
+        "-vf",
+        vf,
+        "-an",
+        "-pix_fmt",
+        "yuv420p",
+        "-r",
+        "24",
+        filePath,
+      ],
+      { stdio: "ignore" }
+    );
+    return "kenburns";
+  } catch {
+    return writePlaceholderMp4(filePath, durationSec, fromImage);
+  }
+}
+
 export function writePlaceholderMp4(filePath, durationSec, fromImage) {
   fs.mkdirSync(path.dirname(filePath), { recursive: true });
   try {
