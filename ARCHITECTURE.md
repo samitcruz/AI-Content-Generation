@@ -17,8 +17,8 @@ validate → narration → keyframes → shots → music → assemble
 | validate | `pipeline/validate.js` | storyboard + schema | `runs.jsonl` | Ajv |
 | narration | `pipeline/narration.js` | narration.am/en per shot | `outputs/narration/{lang}/*.wav` | Gemini TTS |
 | keyframes | `pipeline/keyframes.js` | image prompts + style | `outputs/references/`, `outputs/keyframes/` | FLUX on Cloudflare Workers AI |
-| shots | `pipeline/shots.js` | keyframes + motion prompts | `outputs/shots/*.mp4`, `wan_jobs.json` | Wan 2.2 on Kaggle; Ken Burns fallback |
-| music | `pipeline/music.js` | music cues | `outputs/music/score.*`, brief JSON | ACE-Step 1.5 on Kaggle |
+| shots | `pipeline/shots.js` | keyframes + motion prompts | `outputs/shots/*.mp4` | FFmpeg Ken Burns v2 |
+| music | `pipeline/music.js` | music cues | `outputs/music/score.*`, brief JSON | Gemini Lyria → FFmpeg pad fallback |
 | assemble | `pipeline/assemble.js` | all of the above | `outputs/films/*`, SRT, ducked mix | FFmpeg |
 
 Orchestrator: `npm run film` → `pipeline/run.js`.
@@ -30,7 +30,7 @@ Orchestrator: `npm run film` → `pipeline/run.js`.
 ## Failure handling
 
 - Missing API keys / dry-run: placeholders (silence, solid frames, Ken Burns) so the pipeline still completes.
-- Wan/ACE-Step not ready: local fallbacks; job manifests point to Kaggle notebooks.
+- Music: `npm run music` tries Gemini Lyria (`GEMINI_API_KEY`); on free-tier/quota failure falls back to an audible FFmpeg pad. Drop-in `score.wav`/`score.mp3` also works.
 - Every attempt logged to `runs.jsonl` with status `ok | dry-run | cache-hit | fallback | error`.
 - Retries: re-run a single stage (`npm run keyframes`, etc.); cache prevents unchanged work.
 

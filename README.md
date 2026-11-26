@@ -1,10 +1,13 @@
 # Red After Midnight — Heritage Short Pipeline
 
-60–90s AI film pipeline for the 10 Academy Week 0 challenge: **a late-night teenager finds Manchester United through counter-attacks — and keeps the loyalty after the glory fades.**
+60–90s AI film pipeline for the 10 Academy Week 0 challenge: **a homebound teenager finds Manchester United through dusk kickoffs and counter-attacks — and keeps the loyalty after the glory fades.**
 
 Public repo: [samitcruz/AI-Content-Generation](https://github.com/samitcruz/AI-Content-Generation)
 
 One contract: `storyboard.json`. One command: `npm run film`.
+
+**Finished film (graded cut):** [Google Drive outputs](https://drive.google.com/drive/folders/1Xatyvm5bmQ2fJDovh3T2HrSjtuFrVHNh) — primary `red-after-midnight_am_9x16.mp4`  
+**Live showcase:** [red-after-midnight.vercel.app](https://red-after-midnight.vercel.app) — film, story arc with keyframes, bilingual narration, and the pipeline
 
 ## Quick start
 
@@ -16,7 +19,7 @@ npm run validate
 npm run film
 ```
 
-Films land in `outputs/films/` (Amharic + English × 9:16 + 16:9). Generated media is gitignored; regenerate locally with the pipeline.
+Films land in `outputs/films/` (Amharic + English × 9:16 + 16:9). Generated media is gitignored; regenerate locally with the pipeline, or use the Drive link above.
 
 For live generation: fill `.env`, set `PIPELINE_MODE=live`, install FFmpeg, then `npm run smoke` and `npm run film`.
 
@@ -29,8 +32,10 @@ For live generation: fill `.env`, set `PIPELINE_MODE=live`, install FFmpeg, then
 | `npm run validate` | Schema-check storyboard |
 | `npm run narration` | Gemini TTS (am + en) |
 | `npm run keyframes` | Character sheet + FLUX stills |
-| `npm run shots` | Wan job manifest + Ken Burns fallback |
-| `npm run music` | ACE-Step brief + placeholder bed |
+| `npm run shots` | Ken Burns motion from keyframes |
+| `npm run music` | Lyria (Gemini) → FFmpeg pad fallback |
+| `npm run music:lyria` | Force Lyria path (still FFmpeg if free tier blocks) |
+| `npm run music:generate` | FFmpeg pads only |
 | `npm run assemble` | Duck, subtitles, both aspects |
 | `npm run film` | All of the above |
 | `npm run smoke` | One cheap call per provider |
@@ -49,7 +54,6 @@ EXPERIMENTS.md       hypothesis → change → result
 FAILURES.md          blockers and workarounds
 COSTS.md             latency / GPU / list-price notes
 ETHICS.md            consent, licences, labelling
-kaggle/              Wan + ACE-Step guides
 showcase/            thin React viewer (optional)
 ```
 

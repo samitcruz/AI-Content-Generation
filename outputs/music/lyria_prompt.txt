@@ -1,0 +1,17 @@
+Create one continuous INSTRUMENTAL underscore for a short film (~82 seconds).
+Tempo about 78 BPM. Soft cinematic pad under narration — not a lead song.
+Style: instrumental cinematic underscore, sparse piano and soft strings, dusk tension building into a brief hopeful surge then settling into quiet loyalty, gentle texture under narration, no vocals, no melody that fights speech
+
+STRICT RULES:
+- Instrumental only. No vocals, no choir, no humming, no lyrics.
+- Sparse piano and soft strings; optional quiet low pad.
+- No football chants, stadium anthems, club themes, or recognizable melodies.
+- Gentle dynamics so spoken voice stays readable.
+
+STRUCTURE:
+- 0s: quiet dusk atmosphere under opening ritual
+- 28s: rise with discovery of counter-attacking play
+- 48s: peak joy / stadium awe
+- 64s: soften into lifelong loyalty
+
+Target length: about 82 seconds. Instrumental only.

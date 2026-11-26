@@ -20,31 +20,31 @@ Log as: **hypothesis → change → result**. Target ~10 entries. Evidence in `r
 - **Hypothesis:** Locking an anonymous fan reference first reduces identity drift.
 - **Change:** Generate `outputs/references/character_sheet` before shot keyframes; reuse style block.
 - **Result:** Character remains an anonymous teenage boy across shots; some FLUX variance remains (expected without LoRA). Good enough for Ken Burns cut.
-- **Decision:** Keep reference-first; optional LoRA later if Wan clips amplify drift.
+- **Decision:** Keep reference-first; optional LoRA later if stronger motion amplifies drift.
 
 ### E04 — Motion prompts without re-describing the subject
-- **Hypothesis:** For I2V / fallbacks, motion+camera-only prompts stay more consistent.
-- **Change:** `wan_jobs.json` + Ken Burns use motion/camera; subject stays in the keyframe.
-- **Result:** Ken Burns v2 clips look coherent with still composition. Wan not run yet; contract is ready.
-- **Decision:** Keep this prompt rule for Kaggle Wan.
+- **Hypothesis:** For Ken Burns / any I2V, motion+camera-only prompts stay more consistent.
+- **Change:** Shot manifests + Ken Burns use motion/camera; subject stays in the keyframe.
+- **Result:** Ken Burns v2 clips look coherent with still composition.
+- **Decision:** Keep motion/camera separation in storyboard prompts.
 
-### E05 — Ken Burns as respectable fallback / local animation
-- **Hypothesis:** Varied slow pan/zoom beats static holds when GPU video is unavailable.
-- **Change:** `kenburns-v2` with multiple zoom/pan patterns; notebook `kaggle/wan_ti2v.ipynb`.
-- **Result:** All 10 shots exported as motion stills (~150–340KB+). On-brief floor; Wan remains the upgrade path.
-- **Decision:** Ship Ken Burns; replace shots opportunistically with Wan downloads.
+### E05 — Ken Burns as primary local animation
+- **Hypothesis:** Varied slow pan/zoom beats static holds without needing cloud GPU.
+- **Change:** `kenburns-v2` with multiple zoom/pan patterns (local FFmpeg only).
+- **Result:** All 10 shots exported as motion stills (~150–340KB+). Fast, free, shippable.
+- **Decision:** Ship Ken Burns as the motion path for this submission.
 
-### E06 — ACE-Step candidate batch
-- **Hypothesis:** Three instrumental candidates under narration beat one lucky generation.
-- **Change:** `outputs/music/ace_step_brief.json` prepared for Kaggle ACE-Step.
-- **Result:** Score still placeholder bed (silent/low underlay). Not blocking picture/VO cut; music upgrade pending GPU.
-- **Decision:** Document as known gap; run ACE-Step when Kaggle session available.
+### E06 — Music candidate batch (local FFmpeg pads)
+- **Hypothesis:** Three instrumental candidates under narration beat one silent placeholder.
+- **Change:** `npm run music:generate` — FFmpeg dusk pads, 3 candidates. Chose candidate_1 (softest). Dropped cloud GPU music (too slow / brittle).
+- **Result:** `score.wav` audible (mean ≈ −42 dB, max ≈ −33 dB, 82s). Films reassembled with underscore under VO.
+- **Decision:** FFmpeg cinematic pad is the primary music path; optional: drop any royalty-free instrumental as `score.wav`.
 
 ### E07 — Mixing / ducking on Windows FFmpeg
 - **Hypothesis:** Challenge-suggested sidechaincompress settings will duck music cleanly.
 - **Change:** First assemble used sidechaincompress; failed on stream-label / layout issues with mono silence bed.
 - **Result:** Switched to reliable mono `amix` with quiet bed + alimiter; loudnorm ~−14 LUFS. Voice remains readable.
-- **Decision:** Prefer working `amix` until real music stems exist; revisit sidechain with real ACE-Step audio.
+- **Decision:** Prefer working `amix` with the FFmpeg pad; revisit sidechain if a denser stem is swapped in.
 
 ### E08 — Amharic TTS: Addis Voices 2 vs Gemini
 - **Hypothesis:** Addis male narration sounds more natural in Amharic than Gemini TTS.

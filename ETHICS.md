@@ -23,8 +23,8 @@
 | Asset | Source | Licence / terms (verify) | Commercial notes |
 |-------|--------|--------------------------|------------------|
 | FLUX.1 schnell (Workers AI) | Cloudflare / BFL | Check Cloudflare + BFL terms for your tier | Note daily free allowance |
-| Wan 2.2 TI2V-5B | Wan-AI | Apache 2.0 (weights) | Confirm notebook usage policy |
-| ACE-Step 1.5 | ACE-Step | MIT; outputs generally usable commercially — verify card | Instrumental score only |
+| Ken Burns motion + cinematic pads | Local FFmpeg | LGPL/GPL as installed | Generated locally; no third-party stem licence |
+| Optional drop-in instrumental | User-provided WAV/MP3 | Must be royalty-free / cleared | Replace `outputs/music/score.wav` then assemble |
 | Gemini TTS / Flash | Google AI Studio | Free-tier / data-use terms | Prefer non-private family detail in prompts |
 | FFmpeg assembly | Local | LGPL/GPL as installed | Deterministic edit |
 

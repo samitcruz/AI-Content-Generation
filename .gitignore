@@ -6,7 +6,10 @@ dist/
 .DS_Store
 Thumbs.db
 
-# Large generated media (keep structure; commit small placeholders if needed)
+# Large generated media (keep folder structure via .gitkeep only)
+# Films and other outputs stay local / hosted separately — never commit binaries
+outputs/films/**
+!outputs/films/.gitkeep
 outputs/**/*.mp4
 outputs/**/*.wav
 outputs/**/*.mp3
@@ -25,6 +28,11 @@ pipeline/.cache/
 __pycache__/
 *.pyc
 .ipynb_checkpoints/
+
+# Large local model clones (not used by pipeline)
+tools/
+tools/**/checkpoints/
+tools/**/.venv/
 
 # OS / IDE
 .idea/

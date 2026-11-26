@@ -19,8 +19,8 @@ function resolveKeyframe(shotId) {
   return null;
 }
 
-function isLikelyRealWanClip(filePath) {
-  // Ken Burns clips from stills are usually small; Wan clips are larger.
+function isSubstantialClip(filePath) {
+  // Keep hand-dropped / higher-bitrate clips instead of regenerating Ken Burns.
   try {
     return fs.existsSync(filePath) && fs.statSync(filePath).size > 250000;
   } catch {
@@ -29,30 +29,23 @@ function isLikelyRealWanClip(filePath) {
 }
 
 /**
- * Moving-shots stage.
- * Prefer Wan 2.2 clips from Kaggle when present; otherwise generate varied Ken Burns locally.
+ * Moving-shots stage — varied Ken Burns motion from keyframes (local, free, fast).
  */
 export async function runShots() {
   stageBanner("shots");
   ensureOutputDirs();
   const sb = loadStoryboard();
 
-  const jobs = sb.shots.map((shot) => ({
-    id: shot.id,
-    durationSec: Math.min(5, shot.durationSec),
-    keyframePng: `keyframes/${shot.id}.png`,
-    keyframeJpg: `keyframes/${shot.id}.jpg`,
-    motionPrompt: `${shot.motionPrompt}. Camera: ${shot.camera}. Slow gentle motion only. No logos.`,
-    seed: shot.seed,
-    fallback: shot.fallback || "kenburns",
-  }));
-
-  const manifestPath = path.join(paths.shots, "wan_jobs.json");
-  writeJson(manifestPath, {
-    model: "Wan2.2-TI2V-5B",
-    notebook: "kaggle/wan_ti2v.ipynb",
-    note: "Upload keyframes + this JSON to Kaggle, run GPU notebook, download mp4s into outputs/shots/",
-    jobs,
+  writeJson(path.join(paths.shots, "shots_manifest.json"), {
+    model: "kenburns-v2",
+    note: "Local FFmpeg Ken Burns from FLUX keyframes. Drop custom mp4s into outputs/shots/ to override.",
+    shots: sb.shots.map((shot) => ({
+      id: shot.id,
+      durationSec: shot.durationSec,
+      camera: shot.camera,
+      motionPrompt: shot.motionPrompt,
+      seed: shot.seed,
+    })),
   });
 
   for (const [index, shot] of sb.shots.entries()) {
@@ -74,7 +67,7 @@ export async function runShots() {
       console.log(`skip ${shot.id} (cache)`);
       logRun({
         stage: "shots",
-        model: isLikelyRealWanClip(out) ? "Wan2.2-TI2V-5B" : "kenburns-v2",
+        model: "kenburns-v2",
         parameters: { shot: shot.id, cached: true },
         seed: shot.seed,
         latencyMs: 0,
@@ -84,22 +77,21 @@ export async function runShots() {
       continue;
     }
 
-    if (isLikelyRealWanClip(out)) {
-      writeCacheMeta("shots", key, out, { source: "wan-or-preexisting" });
+    if (isSubstantialClip(out)) {
+      writeCacheMeta("shots", key, out, { source: "preexisting" });
       logRun({
         stage: "shots",
-        model: "Wan2.2-TI2V-5B",
+        model: "preexisting-clip",
         parameters: { shot: shot.id, source: "preexisting-file", bytes: fs.statSync(out).size },
         seed: shot.seed,
         latencyMs: 0,
         costUsd: 0,
         status: "ok",
       });
-      console.log(`ok ${shot.id} (existing Wan-sized clip)`);
+      console.log(`ok ${shot.id} (existing clip)`);
       continue;
     }
 
-    // Force regenerate weak stubs / old still holds
     if (fs.existsSync(out)) fs.unlinkSync(out);
 
     const t0 = Date.now();
@@ -108,30 +100,20 @@ export async function runShots() {
     const bytes = fs.existsSync(out) ? fs.statSync(out).size : 0;
     writeCacheMeta("shots", key, out, {
       dryRun: isDryRun(),
-      fallback: "kenburns",
       how,
       bytes,
     });
     logRun({
       stage: "shots",
       model: isDryRun() ? "dry-run-kenburns" : "kenburns-v2",
-      parameters: {
-        shot: shot.id,
-        fallback: "kenburns",
-        how,
-        bytes,
-        note: "Replace with Wan clip from kaggle/wan_ti2v.ipynb when GPU available",
-      },
+      parameters: { shot: shot.id, how, bytes },
       seed: shot.seed,
       latencyMs: Date.now() - t0,
       costUsd: 0,
-      status: isDryRun() ? "dry-run" : "fallback",
+      status: isDryRun() ? "dry-run" : "ok",
     });
     console.log(`${isDryRun() ? "dry-run" : "kenburns"} ${shot.id} (${how}, ${bytes}B)`);
   }
-
-  console.log(`Job manifest → ${manifestPath}`);
-  console.log("For real I2V: open kaggle/wan_ti2v.ipynb (GPU T4), then copy mp4s into outputs/shots/");
 }
 
 if (isMain(import.meta.url)) {

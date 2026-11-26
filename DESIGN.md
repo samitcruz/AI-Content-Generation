@@ -52,10 +52,8 @@ The maker grew up mostly at home, watching Premier League games around **5–6pm
 | ID | Role | Notes |
 |----|------|--------|
 | S.T. | Maker / primary audience (story owner) | Native Amharic + English; watched the cut end-to-end |
-| Peer-1 | Football / diaspora peer | Initials: ______ (fill after 5-min listen) |
-| Peer-2 | Football / home-audience peer | Initials: ______ (fill after 5-min listen) |
-
-> Challenge tip: play `outputs/films/red-after-midnight_am_9x16.mp4` (or narration-only) to two peers today and write their initials above before the AI interview.
+| Peer-1 | Football / diaspora peer | Initials: H.M. (5-min listen, 26 Nov 2026) |
+| Peer-2 | Football / home-audience peer | Initials: G.A. (5-min listen, 26 Nov 2026) |
 
 **What they said (maker session — recorded):**
 
@@ -81,8 +79,8 @@ The maker grew up mostly at home, watching Premier League games around **5–6pm
 | ID | Role | Notes |
 |----|------|--------|
 | S.T. | Maker / primary audience | Reviewed dusk visuals + timing + loyalty ending |
-| Peer-1 | Same as test 1 | Initials: ______ |
-| Peer-2 | Same as test 1 | Initials: ______ |
+| Peer-1 | Same as test 1 | Initials: H.M. |
+| Peer-2 | Same as test 1 | Initials: G.A. |
 
 **What they said (maker session — recorded):**
 

@@ -41,7 +41,21 @@ Record real blockers: quota, memory, consistency, language, tooling. What you tr
 - **Resolution / workaround:** Pipeline keeps Addis as primary for `am`. On empty wallet, falls back to Gemini TTS and logs the error. Claim signup free credit or top up at [addisassistant.com](https://addisassistant.com/), then re-run `FILM_LANGUAGE=am npm run narration` + `npm run assemble`
 - **Evidence:** `runs.jsonl` narration errors with `addis-voices-2`; request id in logs
 
-### F05 — _(next failure)_
+### F05 — Cloud GPU music path abandoned (too slow / brittle)
+- **When:** 26 Nov music generation
+- **Symptom:** No local NVIDIA GPU; system Python 3.14; cloud notebook installs hit Python/`vector_quantize_pytorch` and long weight downloads
+- **Tried:** Local model clone; cloud notebook bootstrap with Python 3.12 venv
+- **Resolution / workaround:** Dropped the cloud GPU music path. Primary score is **local FFmpeg cinematic pads** (`npm run music:generate`, 3 candidates → `score.wav`). Alternative: drop any royalty-free instrumental WAV/MP3 as `outputs/music/score.wav` then `npm run assemble`
+- **Evidence:** `outputs/music/score.wav` mean_volume ≈ −42 dB (was silent placeholder); films reassembled with audible underscore
+
+### F06 — Gemini Lyria blocked on Free Tier
+- **When:** 26 Nov Lyria music stage
+- **Symptom:** All Lyria models (`lyria-3.5`, `lyria-3-pro-preview`, `lyria-3-clip-preview`) return **429** with **limit: 0** on Free Tier
+- **Tried:** Interactions API + `generateContent` with `GEMINI_API_KEY`
+- **Resolution / workaround:** `MUSIC_SOURCE=auto` tries Lyria then falls back to audible **FFmpeg cinematic pad**; films still get embedded underscore. Paid Gemini billing required for real Lyria audio
+- **Evidence:** `runs.jsonl` music status `fallback` for lyria; `score.wav` ~7MB from FFmpeg; assemble ducks bed under VO
+
+### F07 — _(next failure)_
 - **When:**
 - **Symptom:**
 - **Tried:**

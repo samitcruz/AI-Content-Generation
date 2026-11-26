@@ -3,7 +3,9 @@
 
 **Author:** Samuel Tsegaye  
 **Repository:** https://github.com/samitcruz/AI-Content-Generation  
-**Film:** `outputs/films/red-after-midnight_am_9x16.mp4` (primary) + EN + 16:9 variants  
+**Film (primary):** [Google Drive — `red-after-midnight_am_9x16.mp4`](https://drive.google.com/drive/folders/1Xatyvm5bmQ2fJDovh3T2HrSjtuFrVHNh)  
+**Local path:** `outputs/films/` (Amharic + English × 9:16 + 16:9; gitignored — regenerate with `npm run film`)  
+**Showcase:** [red-after-midnight.vercel.app](https://red-after-midnight.vercel.app)
 
 ---
 
@@ -72,19 +74,19 @@ Practice suggested: measure early (`smoke`, one real TTS call) and log cost/wall
 
 1. **Bilingual exports from one storyboard** — Amharic VO + English burn-in subs, and English VO + Amharic subs (`FILM_LANGUAGE=both`).
 2. **Addis AI for Amharic narration** — production African-language TTS (`am-yohanes-calm`) instead of only Gemini.
-3. **Challenge-aligned motion path** — Ken Burns v2 locally now; Wan 2.2 TI2V job contract + `kaggle/wan_ti2v.ipynb` for GPU I2V when quota allows (not a deviation — it is the brief’s stack).
+3. **Local motion + music without cloud GPU** — Ken Burns v2 for shots; FFmpeg cinematic pads for underscore (`npm run music:generate`). Avoided brittle notebook installs and weight downloads under a tight deadline.
 
-Insight: ceiling work that **changes a decision** (Addis over Gemini; dusk over midnight) scored higher than bolting on unfinished features (full Wan + ACE-Step still optional).
+Insight: ceiling work that **changes a decision** (Addis over Gemini; dusk over midnight; local FFmpeg over cloud GPU music) scored higher than bolting on unfinished GPU features.
 
 ---
 
 ## 6. What I would build next
 
-1. Replace Ken Burns with Wan clips for priority shots (02, 04, 07, 08).  
-2. Generate 3 ACE-Step instrumental candidates; duck for real.  
+1. Stronger Ken Burns patterns or short free I2V clips for priority shots (02, 04, 07, 08).  
+2. Optional denser royalty-free instrumental swap under the same ducking path.  
 3. Package `npm run film` as a tiny CLI others can run from their own storyboard.  
 4. Blind preference test: Addis vs Gemini Amharic with ≥5 listeners.  
-5. Push measured `COSTS.md` after each Wan batch.
+5. Keep `COSTS.md` updated after each live regeneration.
 
 ---
 
@@ -106,7 +108,12 @@ npm run smoke
 npm run film
 ```
 
-Showcase (storyboard UI): `npm run showcase` → http://localhost:5173/
+**Finished film (graded cut):** media is gitignored in git. Watch / download from  
+[Google Drive folder](https://drive.google.com/drive/folders/1Xatyvm5bmQ2fJDovh3T2HrSjtuFrVHNh)  
+(primary: `red-after-midnight_am_9x16.mp4`).
+
+Showcase (storyboard UI): `npm run showcase` → http://localhost:5173/  
+**Live showcase:** https://red-after-midnight.vercel.app (static build of `showcase/`; see `showcase/DEPLOY.md`)
 
 ---
 

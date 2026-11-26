@@ -9,6 +9,8 @@
     "keyframes": "node pipeline/keyframes.js",
     "shots": "node pipeline/shots.js",
     "music": "node pipeline/music.js",
+    "music:generate": "node pipeline/generate_score_ffmpeg.js",
+    "music:lyria": "cross-env MUSIC_SOURCE=lyria node pipeline/music.js",
     "assemble": "node pipeline/assemble.js",
     "film": "node pipeline/run.js",
     "film:am": "cross-env FILM_LANGUAGE=am node pipeline/run.js",

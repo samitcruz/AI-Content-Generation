@@ -86,9 +86,17 @@ function wrapSub(text) {
 function musicFile() {
   const wav = path.join(paths.music, "score.wav");
   const mp3 = path.join(paths.music, "score.mp3");
-  if (fs.existsSync(wav)) return wav;
-  if (fs.existsSync(mp3)) return mp3;
-  return null;
+  const candidates = [wav, mp3].filter((p) => {
+    try {
+      return fs.existsSync(p) && fs.statSync(p).size > 8000;
+    } catch {
+      return false;
+    }
+  });
+  if (!candidates.length) return null;
+  // Prefer the newest audible score (Lyria mp3 vs FFmpeg wav).
+  candidates.sort((a, b) => fs.statSync(b).mtimeMs - fs.statSync(a).mtimeMs);
+  return candidates[0];
 }
 
 function buildConcatList(sb, workDir) {

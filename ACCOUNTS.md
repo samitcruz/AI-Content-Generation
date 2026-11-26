@@ -30,19 +30,7 @@ Used for: Amharic TTS via Addis Voices 2. Docs: https://docs.addisassistant.com/
 
 Used for: FLUX keyframes + character sheet (daily free allowance).
 
-## 3. Kaggle (required for Wan video + ACE-Step music)
-
-1. Create / log in at [kaggle.com](https://www.kaggle.com/)
-2. **Phone-verify** the account (needed for GPU)
-3. Open notebooks under `kaggle/` in this repo (upload or copy cells)
-4. Enable GPU (T4) in notebook settings
-5. Download outputs into:
-   - `outputs/shots/shot_XX.mp4`
-   - `outputs/music/score.wav`
-
-Used for: moving shots (Wan 2.2), score (ACE-Step 1.5). Weekly GPU hours are the bottleneck.
-
-## 4. FFmpeg on this machine (required for real assemble)
+## 3. FFmpeg on this machine (required for shots, music, assemble)
 
 Windows: install FFmpeg and ensure `ffmpeg` works in PowerShell.
 
@@ -51,17 +39,25 @@ Windows: install FFmpeg and ensure `ffmpeg` works in PowerShell.
 
 Then reopen the terminal and run `ffmpeg -version`.
 
-## 5. Node.js (already OK)
+Used for: Ken Burns motion, local cinematic music pads (`npm run music:generate`), assemble.
+
+## 4. Node.js (already OK)
 
 Detected: Node v24 + npm. Run `npm install` in the project root.
 
-## 6. Coding agent
+## 5. Coding agent
 
 **Cursor** writes/maintains the pipeline under your direction. That satisfies the challenge’s “coding agent under your direction” intent. Optional extras (not required): Antigravity CLI, OpenCode.
 
-## 7. Optional showcase hosting
+## 6. Optional showcase hosting (Vercel)
 
-Hugging Face Space or any static host for the thin React showcase — after the film exists.
+Thin React storyboard UI in `showcase/` — see `showcase/DEPLOY.md`.
+
+1. `cd showcase && npm run build`
+2. `npx vercel login` then `npx vercel deploy dist --prod`
+3. Put the production URL in `README.md` / `REPORT.md`
+
+Finished film MP4s stay on [Google Drive](https://drive.google.com/drive/folders/1Xatyvm5bmQ2fJDovh3T2HrSjtuFrVHNh) (not on Vercel).
 
 ---
 

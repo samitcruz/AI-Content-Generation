@@ -1,0 +1,31 @@
+{
+  "model": "lyria-or-ffmpeg",
+  "caption": "instrumental cinematic underscore, sparse piano and soft strings, dusk tension building into a brief hopeful surge then settling into quiet loyalty, gentle texture under narration, no vocals, no melody that fights speech",
+  "durationSec": 82,
+  "tempoBpm": 78,
+  "instrumental": true,
+  "cues": [
+    {
+      "atSec": 0,
+      "purpose": "quiet dusk atmosphere under opening ritual"
+    },
+    {
+      "atSec": 28,
+      "purpose": "rise with discovery of counter-attacking play"
+    },
+    {
+      "atSec": 48,
+      "purpose": "peak joy / stadium awe"
+    },
+    {
+      "atSec": 64,
+      "purpose": "soften into lifelong loyalty"
+    }
+  ],
+  "outputFilenames": [
+    "score.mp3",
+    "score.wav"
+  ],
+  "lyriaPromptFile": "lyria_prompt.txt",
+  "musicSource": "auto"
+}

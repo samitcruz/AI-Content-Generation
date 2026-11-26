@@ -85,12 +85,6 @@ async function main() {
   results.push({ provider: "ffmpeg", status: hasFfmpeg() ? "ok" : "missing" });
   results.push(await smokeGemini());
   results.push(await smokeCloudflare());
-  results.push({
-    provider: "kaggle",
-    status: "manual",
-    detail: "Phone-verify at kaggle.com, then open kaggle/ notebooks with GPU",
-  });
-
   for (const r of results) {
     logRun({
       stage: "smoke",
