@@ -2,6 +2,8 @@
 
 60–90s AI film pipeline for the 10 Academy Week 0 challenge: **a late-night teenager finds Manchester United through counter-attacks — and keeps the loyalty after the glory fades.**
 
+Public repo: [samitcruz/AI-Content-Generation](https://github.com/samitcruz/AI-Content-Generation)
+
 One contract: `storyboard.json`. One command: `npm run film`.
 
 ## Quick start
@@ -14,7 +16,7 @@ npm run validate
 npm run film
 ```
 
-Films land in `outputs/films/` (Amharic + English × 9:16 + 16:9).
+Films land in `outputs/films/` (Amharic + English × 9:16 + 16:9). Generated media is gitignored; regenerate locally with the pipeline.
 
 For live generation: fill `.env`, set `PIPELINE_MODE=live`, install FFmpeg, then `npm run smoke` and `npm run film`.
 
